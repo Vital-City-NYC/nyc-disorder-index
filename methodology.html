@@ -59,7 +59,7 @@
 <tr><td>Panhandling</td><td>Panhandling</td><td>Panhandling is legal. 311 accepts reports about aggressive or traffic-obstructing solicitation.</td></tr>
 <tr><td>Streets in disrepair</td><td>Street Condition; Sidewalk Condition</td><td>Physical decay of the streetscape: potholes, cave-ins, broken pavement, damaged sidewalks.</td></tr>
 </table>
-<p>The strands are presented as equals even though their volumes differ enormously — noise generates roughly 30 times as many reports as graffiti. That is deliberate: call volume reflects how reportable a problem is, not how much it matters.</p>
+<p>The strands are presented as equals even though their volumes differ enormously — over the past 12 months, noise generated about 46 times as many reports as graffiti (791,202 versus 17,212 citywide). That is deliberate: call volume reflects how reportable a problem is, not how much it matters.</p>
 
 <h2>Geography</h2>
 <p>The unit is the community district, using the 311 record's <code>community_board</code> field, which the city assigns from the incident address. The 59 real community districts are included; records assigned to parks and other joint interest areas (such as Central Park) or marked "Unspecified" are excluded from district figures but included in citywide totals. In the analysis window, 2.6 percent of tracked reports could not be assigned to a district.</p>
@@ -72,7 +72,7 @@
 <p>For each strand, districts are ranked by reports per 1,000 residents over the past 12 months and divided into thirds: the 20 districts with the most reports per resident, the middle 19 and the 20 with the fewest. We use thirds rather than precise ranks or scores in the display because the underlying data does not support finer distinctions — though the exact rank (1 to 59) is shown for orientation.</p>
 <h3>Concentration flag</h3>
 <p>A known artifact of 311 data is the prolific address: a single building or corner (or a single determined caller) that generates enough reports to move a whole district's trend. For each district and strand we compute reports per distinct incident address over the past 12 months. Where that ratio is at least three times the citywide ratio for the same strand and the district logged at least 100 reports, the card carries a flag: a small number of addresses accounts for an outsized share. The flag is a caution, not a correction — the reports are real, but the trend may not describe the whole neighborhood.</p>
-<p>One technical note: distinct-address counts are computed per complaint type and summed within a strand, so an address reported under two complaint types counts twice in the denominator. This makes the flag slightly conservative (less likely to fire), never more aggressive.</p>
+<p>One technical note: for strands built from more than one complaint type, distinct-address counts are computed per complaint type and summed, so an address that generates two different complaint types is counted twice in the denominator. This makes the reports-per-address ratio an approximation rather than a true distinct-address count. Because the same method is applied to both a district and the citywide baseline it is compared against, the effect on the ratio is small; the four single-type strands (rats, illegal dumping, graffiti, panhandling) are exact. The flag is meant as a caution to investigate, not a precise statistic.</p>
 
 <h2>What we deliberately left out, and why</h2>
 <table>

@@ -27,6 +27,7 @@ python3 scripts/build_data.py          # ~1 minute; three aggregate queries agai
 - `methodology.html` — full public methodology: sources, strand definitions, formulas, exclusions, limitations
 - `scripts/build_data.py` — 311 aggregation pipeline → `data/disorder_data.json`
 - `scripts/build_populations.py` — 2020 census tract populations → community districts
+- `scripts/verify.py` — independent re-query of NYC Open Data that diffs every published number against the source (run `python3 scripts/verify.py`; prints PASS/FAIL per claim)
 - `data/community_districts.geojson` — Department of City Planning boundaries, shoreline-clipped
 - `data/cd_names.json` — district display names
 
@@ -38,6 +39,6 @@ python3 scripts/build_data.py          # ~1 minute; three aggregate queries agai
 
 ## Verification notes
 
-Citywide totals printed by the pipeline were cross-checked against the page. Three district-level figures (Brooklyn CD 1 rodents, Manhattan CD 12 noise for March 2026, Brooklyn CD 6 noise rate) were verified against independent direct queries of the dataset and matched exactly. The concentration flag independently surfaces the known Corona artifact (Queens CD 4 drug complaints driven by a handful of addresses) that was discussed on the team call.
+`scripts/verify.py` independently re-queries NYC Open Data with different query shapes than the pipeline and diffs the result against every published figure. As of the July 2, 2026 build, all 29 checks pass: the full-window total (6,455,356), each strand's citywide 12-month count, trend denominators, every published percent change recomputed from its parts, the unassigned share (2.6%), the population denominator (8,803,186 of the city's 8,804,190 residents), a concentration-flagged case, and several district rates. The concentration flag independently surfaces the known Corona artifact (Queens CD 4 drug complaints driven by a handful of addresses) that was discussed on the team call.
 
 Not yet deployed. Not yet editor-reviewed.
