@@ -230,6 +230,30 @@ function ordinal(n) {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
+/* A district's rate stated against the citywide norm, in plain numbers.
+   In a disorder index more is worse, so above-average is flagged in red and
+   below-average in green — the same valence as the map and the trend badges. */
+function cityCompareLine(strand, st) {
+  const cw = strand.citywide.rate;
+  if (!cw || st.rate == null) return '';
+  const ratio = st.rate / cw;
+  const cwTxt = cw.toLocaleString('en-US', { maximumFractionDigits: 1 });
+  let cls, arrow, phrase;
+  if (ratio >= 1.15) {
+    cls = 'above'; arrow = '▲';
+    phrase = ratio >= 2.5
+      ? `${ratio.toFixed(1)}× the citywide rate of ${cwTxt}`
+      : `${Math.round((ratio - 1) * 100)}% above the citywide rate of ${cwTxt}`;
+  } else if (ratio <= 0.85) {
+    cls = 'below'; arrow = '▼';
+    phrase = `${Math.round((1 - ratio) * 100)}% below the citywide rate of ${cwTxt}`;
+  } else {
+    cls = 'same'; arrow = '▬';
+    phrase = `about the citywide rate of ${cwTxt}`;
+  }
+  return `<p class="city-compare ${cls}">${arrow} ${phrase} per 1,000</p>`;
+}
+
 /* ---------- conditions layer (inspections, not 311 reports) ----------
    A handful of strands can be cross-checked against city inspection data —
    people looking, not people calling. Returns the block HTML or '' . */
@@ -252,7 +276,7 @@ function conditionsBlock(sid, st311) {
       const trend = cs.trend
         ? ` — ${TREND_ARROW[cs.trend]} ${cs.trend} from ${pctNum(cs.prior)} the year before`
         : '';
-      body = `Inspectors found active rat signs in <strong>${pctNum(cs.value)}</strong> of ${fmtNum(cs.base)} inspections here over the past 12 months, ${ordinal(cs.rank)}-highest of 59 districts${trend}.`;
+      body = `Inspectors found active rat signs in <strong>${pctNum(cs.value)}</strong> of ${fmtNum(cs.base)} inspections here over the past 12 months, ${ordinal(cs.rank)}-highest of 59 districts${trend}. Citywide, the rate is ${pctNum(m.citywide.value)}.`;
       // neutral, numeric divergence callout
       if (st311 && st311.rank && cs.rank && Math.abs(st311.rank - cs.rank) >= 20) {
         const repHigh = st311.rank < cs.rank; // lower rank number = more reports
@@ -264,7 +288,7 @@ function conditionsBlock(sid, st311) {
     }
   } else if (sid === 'decay') {
     if (selected) {
-      body = `<strong>${pctNum(cs.value)}</strong> of this district's rated roadway is in poor condition (average rating ${cs.avg_rating} of 10), ${ordinal(cs.rank)}-worst of 59.`;
+      body = `<strong>${pctNum(cs.value)}</strong> of this district's rated roadway is in poor condition (average rating ${cs.avg_rating} of 10), ${ordinal(cs.rank)}-worst of 59. Citywide, ${pctNum(m.citywide.value)} of rated roadway is poor.`;
     } else {
       body = `<strong>${pctNum(cs.value)}</strong> of the city's rated roadway is in poor condition; average rating ${cs.avg_rating} of 10.`;
     }
@@ -302,6 +326,7 @@ function renderCards() {
         <span class="big-num">${st.rate.toLocaleString('en-US', { maximumFractionDigits: 1 })}</span>
         <span class="big-label">reports per 1,000 residents, past 12 months</span>
       </div>
+      ${selected ? cityCompareLine(s, st) : ''}
       ${standing}
       ${sparklineSVG(s.id)}
       <div class="spark-caption"><span>${fmtMonth(DATA.meta.months[0])}</span><span>${selected ? 'orange: district · dashed: citywide' : 'citywide per 1,000 residents'}</span><span>${fmtMonth(DATA.meta.months.at(-1))}</span></div>
