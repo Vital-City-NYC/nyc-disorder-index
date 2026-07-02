@@ -12,7 +12,7 @@ const BORO_ORDER = ['Manhattan','Bronx','Brooklyn','Queens','Staten Island'];
 // rising/falling requires at least a 10% swing between 12-month windows.
 const TREND_UP = 10, TREND_DOWN = -10;
 
-let DATA = null, GEO = null, COND = null;
+let DATA = null, GEO = null, COND = null, QUOTES = null;
 let selected = null;            // boro_cd string or null for citywide
 let yFromZero = true;
 let map, geoLayer, mapMode = 'rate', mapStrand = null;
@@ -46,8 +46,9 @@ Promise.all([
   fetch('data/disorder_data.json').then(r => r.json()),
   fetch('data/community_districts.geojson').then(r => r.json()),
   fetch('data/conditions_data.json').then(r => r.json()).catch(() => null),
-]).then(([data, geo, cond]) => {
-  DATA = data; GEO = geo; COND = cond;
+  fetch('data/quotes_data.json').then(r => r.json()).catch(() => null),
+]).then(([data, geo, cond, quotes]) => {
+  DATA = data; GEO = geo; COND = cond; QUOTES = quotes;
   mapStrand = DATA.strands[0].id;
   $('heroMeta').textContent =
     `Covers ${fmtMonth(DATA.meta.months[0])} through ${fmtMonth(DATA.meta.months.at(-1))} · ` +
@@ -156,6 +157,7 @@ function render() {
     `<span class="chip steady">▬ ${counts.steady.length} steady</span>` +
     `<span class="chip falling">▼ ${counts.falling.length} falling</span>`;
 
+  renderVoices();
   renderCards();
   renderCompare();
   if (geoLayer) paintMap();
@@ -196,6 +198,32 @@ const STANDING_TEXT = {
   mid: 'Around the middle of the city',
   low: 'Fewer reports per resident than most of the city',
 };
+
+/* ---------- resident voices ----------
+   Interview quotes matched to a resident's neighborhood, shown on its primary
+   community district. Only quotes touching a tracked disorder strand are here
+   (crime-only comments are filtered out in the pipeline). */
+function renderVoices() {
+  const box = $('voices');
+  if (!box) return;
+  const q = (selected && QUOTES && QUOTES.districts[selected]) || null;
+  if (!q) { box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  const labels = QUOTES.strand_label;
+  const n = q.quotes.length;
+  const dr = [q.quotes.at(-1).iso, q.quotes[0].iso].map(d => fmtMonth(d.slice(0, 7)));
+  const items = q.quotes.map(x => `
+    <figure class="voice">
+      <blockquote>“${x.text}”</blockquote>
+      <figcaption>— ${x.who} · <span class="voice-date">${x.date}</span>
+        <span class="voice-tags">${x.tags.map(t => `<span class="voice-tag">${labels[t]}</span>`).join('')}</span>
+      </figcaption>
+    </figure>`).join('');
+  box.innerHTML = `
+    <div class="voices-head">What residents told us</div>
+    <p class="voices-sub">${n} resident${n > 1 ? 's' : ''} in ${q.neighborhoods.join(', ')}, interviewed ${dr[0] === dr[1] ? dr[0] : dr[0] + '–' + dr[1]}. These are verbatim comments that touch the disorder strands tracked here; comments about crime are not shown. <a href="methodology.html#voices">How these were selected</a>.</p>
+    <div class="voices-list">${items}</div>`;
+}
 
 function ordinal(n) {
   const s = ['th', 'st', 'nd', 'rd'], v = n % 100;

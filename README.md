@@ -27,6 +27,8 @@ python3 scripts/build_data.py          # ~1 minute; three aggregate queries agai
 - `methodology.html` — full public methodology: sources, strand definitions, formulas, exclusions, limitations
 - `scripts/build_data.py` — 311 aggregation pipeline → `data/disorder_data.json`
 - `scripts/build_populations.py` — 2020 census tract populations → community districts
+- `scripts/build_conditions.py` — inspection data (rodent inspections + pavement ratings) → `data/conditions_data.json`, the "reports vs. conditions" layer
+- `scripts/build_quotes.py` — parses the resident-interview PDF, tags each quote by disorder strand, maps neighborhoods to community districts → `data/quotes_data.json` (only disorder-relevant quotes; crime-only quotes are set aside)
 - `scripts/verify.py` — independent re-query of NYC Open Data that diffs every published number against the source (run `python3 scripts/verify.py`; prints PASS/FAIL per claim)
 - `data/community_districts.geojson` — Department of City Planning boundaries, shoreline-clipped
 - `data/cd_names.json` — district display names

@@ -118,6 +118,24 @@ select {
 .chip.falling { background: #e8f3e5; border-color: var(--vc-good); color: #2f6b28; }
 .chip.steady { background: #f2f2f2; border-color: var(--vc-charcoal); color: var(--vc-charcoal); }
 
+/* Resident voices */
+.voices { margin-top: 22px; border-top: 2px solid var(--vc-black); padding-top: 16px; }
+.voices-head { font-weight: 900; font-size: 20px; margin-bottom: 4px; }
+.voices-sub { font-size: 13.5px; color: var(--vc-charcoal); margin: 0 0 16px; max-width: 68ch; line-height: 1.45; }
+.voices-sub a { color: var(--vc-charcoal); }
+.voices-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.voice { margin: 0; padding: 14px 16px; background: #faf9f2; border-left: 4px solid var(--vc-chartreuse); border-radius: 3px; }
+.voice blockquote {
+  margin: 0 0 8px; font-family: var(--font-serif); font-size: 18px; line-height: 1.4; color: var(--vc-black);
+}
+.voice figcaption { font-size: 12.5px; color: var(--vc-charcoal); line-height: 1.5; }
+.voice-date { white-space: nowrap; }
+.voice-tags { display: inline-flex; flex-wrap: wrap; gap: 5px; margin-left: 2px; vertical-align: middle; }
+.voice-tag {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+  background: #ecedd4; color: #5a5e1f; padding: 2px 7px; border-radius: 999px;
+}
+
 /* Cards */
 .cards-section { padding: 26px 0 6px; }
 .cards-controls { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 10px; }
