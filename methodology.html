@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Methodology — The disorder index — Vital City</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="gate.js"></script>
+<link rel="stylesheet" href="https://use.typekit.net/qqk2vto.css">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .method { max-width: 76ch; padding: 30px 0 60px; }
+  .method h2 { margin-top: 36px; }
+  .method h3 { font-weight: 900; font-size: 19px; margin: 26px 0 8px; }
+  .method table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 14px 0; }
+  .method th { text-align: left; font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--vc-charcoal); border-bottom: 2px solid var(--vc-black); padding: 8px 10px; }
+  .method td { padding: 8px 10px; border-bottom: 1px solid var(--vc-cloud); vertical-align: top; }
+  code { background: #f4f4f4; padding: 1px 5px; border-radius: 3px; font-size: 13.5px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="wordmark" href="https://www.vitalcitynyc.org">VITAL CITY</a>
+  <a href="index.html" style="font-size:14px">← Back to the index</a>
+</header>
+
+<main class="method">
+
+<h1 style="font-weight:900;font-size:clamp(32px,5vw,48px);line-height:1.05">How the disorder index works</h1>
+<p class="dek" style="font-family:var(--font-serif)">Every source, every grouping, every formula and every known limitation. Nothing here is a black box.</p>
+
+<h2>What this is</h2>
+<p>The disorder index tracks ten strands of everyday street disorder in New York City's 59 community districts, using the city's record of complaints to 311, the non-emergency service line. For each strand and each district it reports the direction of change (the past 12 months against the 12 before), the district's standing relative to the rest of the city (reports per 1,000 residents) and a monthly trend line back to January 2021.</p>
+<p>It deliberately does not compute a single composite disorder score. The strands are measured with different reliability, reflect different behaviors and would require arbitrary weights to combine. A neighborhood that scored "62" would invite false precision; a neighborhood that is loud but clean would disappear into the average. We report the strands side by side and let the pattern speak.</p>
+
+<h2>Data sources</h2>
+<table>
+<tr><th>Source</th><th>Provider</th><th>Coverage used</th><th>Accessed</th></tr>
+<tr><td><a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">311 Service Requests from 2010 to Present</a> (erm2-nwe9)</td><td>NYC Open Data</td><td>Records created January 1, 2021 through June 30, 2026</td><td>July 2, 2026</td></tr>
+<tr><td>2020 decennial census, table P1 (total population) by census tract, via <a href="https://api.census.gov">api.census.gov</a></td><td>U.S. Census Bureau</td><td>April 1, 2020 counts</td><td>July 2, 2026</td></tr>
+<tr><td><a href="https://www.nyc.gov/assets/planning/download/office/planning-level/nyc-population/census2020/nyc2020census_tract_nta_cdta_relationships.xlsx?r=092221">2020 census tract to community district tabulation area relationship file</a></td><td>NYC Department of City Planning</td><td>2020 geographies</td><td>July 2, 2026</td></tr>
+<tr><td>Community district boundaries (water excluded)</td><td>NYC Department of City Planning, via its public ArcGIS service</td><td>Current boundaries</td><td>July 2, 2026</td></tr>
+</table>
+<p>All 311 figures were retrieved as server-side aggregates (counts grouped by community board, complaint type and month) directly from the Open Data application programming interface. No raw records were re-keyed by hand at any point.</p>
+
+<h2>The ten strands</h2>
+<p>Each strand is the sum of specific, exact 311 complaint types. A report counts toward a strand if and only if its complaint type appears below. The groupings are editorial choices; this table is the complete definition.</p>
+<table>
+<tr><th>Strand</th><th>311 complaint types included</th><th>Notes</th></tr>
+<tr><td>Noise</td><td>Noise - Residential; Noise - Street/Sidewalk; Noise - Commercial; Noise - Vehicle; Noise; Noise - Park; Noise - House of Worship</td><td>Excludes helicopter noise (ambient, not street-level) and illegal fireworks (extremely seasonal; including them whipsaws the trend).</td></tr>
+<tr><td>Street homelessness</td><td>Encampment; Homeless Person Assistance</td><td>Counts reports about people and encampments in public space, which is not a count of homeless people. Most homeless New Yorkers are in shelters and never appear here.</td></tr>
+<tr><td>Rats and rodents</td><td>Rodent</td><td>Includes rat and mouse sightings and conditions attracting rodents.</td></tr>
+<tr><td>Dirty streets</td><td>Dirty Condition; Litter Basket Complaint</td><td>Excludes missed trash collection and street-sweeping complaints, which reflect sanitation service rather than observed street conditions.</td></tr>
+<tr><td>Illegal dumping</td><td>Illegal Dumping</td><td></td></tr>
+<tr><td>Graffiti</td><td>Graffiti</td><td>Reporting is weakly tied to prevalence — people walk past graffiti without calling. Treat levels with caution; trends are more meaningful.</td></tr>
+<tr><td>Abandoned vehicles</td><td>Abandoned Vehicle; Derelict Vehicles</td><td>Two intake channels for similar conditions (police and sanitation).</td></tr>
+<tr><td>Public drug and alcohol use</td><td>Drug Activity; Drinking; Urinating in Public</td><td>Public urination generates very few 311 calls and is certainly undercounted; it appears mostly in enforcement data, which we exclude (see below).</td></tr>
+<tr><td>Panhandling</td><td>Panhandling</td><td>Panhandling is legal. 311 accepts reports about aggressive or traffic-obstructing solicitation.</td></tr>
+<tr><td>Streets in disrepair</td><td>Street Condition; Sidewalk Condition</td><td>Physical decay of the streetscape: potholes, cave-ins, broken pavement, damaged sidewalks.</td></tr>
+</table>
+<p>The strands are presented as equals even though their volumes differ enormously — noise generates roughly 30 times as many reports as graffiti. That is deliberate: call volume reflects how reportable a problem is, not how much it matters.</p>
+
+<h2>Geography</h2>
+<p>The unit is the community district, using the 311 record's <code>community_board</code> field, which the city assigns from the incident address. The 59 real community districts are included; records assigned to parks and other joint interest areas (such as Central Park) or marked "Unspecified" are excluded from district figures but included in citywide totals. In the analysis window, 2.6 percent of tracked reports could not be assigned to a district.</p>
+<p>Population denominators come from the 2020 decennial census: total population of each census tract, summed into community district tabulation areas, City Planning's tract-built approximations of the community districts. The 59 districts account for 8,803,186 of the city's 8,804,190 residents; the remainder live in park tracts. Denominators are held fixed at 2020 throughout, so multi-year rate changes partly reflect population change. This matters most in fast-growing districts.</p>
+
+<h2>Calculations</h2>
+<h3>Trend</h3>
+<p>For each district and strand: total reports in the 12 months July 2025 through June 2026, compared with July 2024 through June 2025. Percent change = (recent − prior) ÷ prior × 100. Comparing full 12-month windows removes seasonality — a January is always weighed against a January. A strand is labeled <strong>rising</strong> at +10 percent or more, <strong>falling</strong> at −10 percent or less and <strong>steady</strong> in between. Where the prior window had fewer than 30 reports, no trend is called: percentage swings on tiny bases are noise.</p>
+<h3>Standing</h3>
+<p>For each strand, districts are ranked by reports per 1,000 residents over the past 12 months and divided into thirds: the 20 districts with the most reports per resident, the middle 19 and the 20 with the fewest. We use thirds rather than precise ranks or scores in the display because the underlying data does not support finer distinctions — though the exact rank (1 to 59) is shown for orientation.</p>
+<h3>Concentration flag</h3>
+<p>A known artifact of 311 data is the prolific address: a single building or corner (or a single determined caller) that generates enough reports to move a whole district's trend. For each district and strand we compute reports per distinct incident address over the past 12 months. Where that ratio is at least three times the citywide ratio for the same strand and the district logged at least 100 reports, the card carries a flag: a small number of addresses accounts for an outsized share. The flag is a caution, not a correction — the reports are real, but the trend may not describe the whole neighborhood.</p>
+<p>One technical note: distinct-address counts are computed per complaint type and summed within a strand, so an address reported under two complaint types counts twice in the denominator. This makes the flag slightly conservative (less likely to fire), never more aggressive.</p>
+
+<h2>What we deliberately left out, and why</h2>
+<table>
+<tr><th>Candidate source</th><th>Why it is not here</th></tr>
+<tr><td>Criminal summonses (New York Police Department)</td><td>Summons counts track where officers are deployed and what they choose to enforce at least as much as where disorder occurs. A neighborhood can look worse simply because it got more enforcement attention. We may add enforcement data later as a clearly separated layer, never blended into the strands.</td></tr>
+<tr><td>911 calls for service</td><td>A promising future addition — calling 911 is costlier for the caller than 311, so it may track genuine problems more tightly. But the public dataset is organized by police precinct, which does not align with community districts, and mixing geographies would quietly corrupt comparisons. Held for a future version.</td></tr>
+<tr><td>Subway fare evasion</td><td>Measured through enforcement and inspection, with the same deployment bias as summonses, and not published at neighborhood level.</td></tr>
+<tr><td>Storefront vacancies</td><td>The public registry data lags badly — the most recent reliable figures are years old — and this tool is built to be refreshed monthly.</td></tr>
+<tr><td>Mayor's Management Report cleanliness scorecards</td><td>Published on a long lag, with neighborhood-to-neighborhood variation too small to rank meaningfully (most districts score above 90 percent acceptably clean).</td></tr>
+</table>
+
+<h2>Limitations, plainly</h2>
+<p><strong>This measures reporting, not prevalence.</strong> Every number is a count of complaints, which requires a resident who noticed, cared and knew how to call. Neighborhoods differ systematically in all three. Comparisons between districts are therefore softer than comparisons of the same district over time, which is why the trend gets top billing.</p>
+<p><strong>Reporting propensity can itself trend.</strong> A 311 outreach campaign, a new app feature or a neighborhood group's push can raise reports with no change in conditions. The concentration flag catches the single-address version of this; it cannot catch a diffuse shift in habits.</p>
+<p><strong>Complaint categories change.</strong> Agencies occasionally rename or split 311 complaint types. The window starts in January 2021 partly to stay within a stable stretch of the current taxonomy. If a category changes, this page's definitions will be updated and noted.</p>
+<p><strong>Population denominators are fixed at April 2020.</strong> See geography, above.</p>
+<p><strong>June 2026 is the freshest month shown</strong> and was pulled two days after it ended. 311 records are created at intake, so late-arriving records are rare but not impossible.</p>
+
+<h2>Reproducibility</h2>
+<p>The pipeline is two short Python scripts in the project repository: <code>scripts/build_populations.py</code> (census tract populations into district denominators) and <code>scripts/build_data.py</code> (311 aggregates into <code>data/disorder_data.json</code>, the single file the page reads). Both use only documented public endpoints, run in under two minutes and print citywide totals for cross-checking against the published page. Re-running them each month refreshes the entire product.</p>
+
+<p style="margin-top:40px;color:var(--vc-charcoal);font-size:14px">Questions, corrections or a strand we should add? This is a first measure — the best available from administrative data, not the last word.</p>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="wordmark-footer">VITAL CITY</span>
+    <p><a href="index.html">The disorder index</a> · Source: <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">311 Service Requests from 2010 to Present</a> (NYC Open Data), accessed July 2, 2026</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The disorder index — Vital City</title>
+<meta name="description" content="Ten everyday signals of street disorder — noise, rats, trash, graffiti and more — tracked neighborhood by neighborhood from what New Yorkers report to 311.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="https://use.typekit.net/qqk2vto.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+<script src="gate.js"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="wordmark" href="https://www.vitalcitynyc.org">VITAL CITY</a>
+  <button class="ai-caution-btn" id="aiCautionBtn">AI caution</button>
+  <div class="ai-caution-pop" id="aiCautionPop" hidden>
+    <strong>How this was made</strong>
+    <ul>
+      <li>Built with AI assistance (Claude). A human editor has not yet reviewed it.</li>
+      <li>Every number is pulled directly from NYC Open Data by aggregation query; none was typed by hand.</li>
+      <li>Several district figures were spot-checked against independent direct queries of the same dataset and matched exactly.</li>
+      <li>The grouping of 311 complaint types into ten strands is an editorial choice, documented in full in the <a href="methodology.html">methodology</a>.</li>
+      <li>311 reports measure what people report, not how much disorder actually exists. Read the caveats before citing.</li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <h1>The disorder index</h1>
+  <p class="dek">Ten everyday signals of street disorder — noise, rats, trash, graffiti and more — tracked neighborhood by neighborhood from what New Yorkers report.</p>
+  <p class="hero-meta" id="heroMeta">Loading data…</p>
+</section>
+
+<section class="intro">
+  <p>Crime statistics get headlines, but much of what shapes how a block feels day to day never becomes a crime statistic: the party that goes until 4 a.m., the rat in the tree pit, the mattress dumped on the corner, the encampment by the underpass. This page tracks ten of those signals — we call them strands of disorder — using the city's own record of what residents report to 311, the city's non-emergency complaint line.</p>
+  <p>There is no single disorder score here, on purpose. A neighborhood can be quiet but dirty, or loud but spotless, and one number would bury that. Instead, for each strand you get three plain facts: <strong>which direction it's heading</strong> (the past 12 months against the 12 before), <strong>how the neighborhood compares with the rest of the city</strong> (adjusted for population) and <strong>the trend over five and a half years</strong>. The fine print on every card says exactly which complaint types feed it.</p>
+  <p class="caveat">One caveat above all: this is a record of <em>reporting</em>, not a census of disorder. Neighborhoods differ in how readily people call 311, and a jump can mean more problems or more willingness to report them. Where a handful of addresses drives a number, we flag it. The <a href="methodology.html">methodology</a> spells out every choice and every limitation.</p>
+</section>
+
+<section class="picker-section" id="pickerSection">
+  <h2>Pick a neighborhood</h2>
+  <div class="picker-row">
+    <select id="districtSelect" aria-label="Choose a community district"></select>
+    <button class="link-btn" id="citywideBtn">or view citywide</button>
+  </div>
+</section>
+
+<section class="story" id="storySection">
+  <h2 class="story-title" id="storyTitle"></h2>
+  <p class="verdict" id="verdictText"></p>
+  <div class="verdict-chips" id="verdictChips"></div>
+</section>
+
+<section class="cards-section">
+  <div class="cards-controls">
+    <span class="control-label">Charts:</span>
+    <label class="toggle"><input type="checkbox" id="yZeroToggle" checked> y-axis starts at zero</label>
+  </div>
+  <div class="cards-grid" id="cardsGrid"></div>
+</section>
+
+<section class="map-section">
+  <h2>The whole city, one strand at a time</h2>
+  <div class="map-controls">
+    <select id="mapStrandSelect" aria-label="Choose a strand to map"></select>
+    <div class="mode-toggle" role="group" aria-label="Map mode">
+      <button class="mode-btn active" data-mode="rate">Reports per 1,000 residents</button>
+      <button class="mode-btn" data-mode="change">Change vs prior 12 months</button>
+    </div>
+  </div>
+  <div id="map"></div>
+  <div class="map-legend" id="mapLegend"></div>
+  <p class="map-note">Past 12 months. Community district boundaries from the Department of City Planning, clipped to the shoreline. Tap a district to load its story above.</p>
+</section>
+
+<section class="compare-section">
+  <h2>Compare two neighborhoods</h2>
+  <div class="picker-row">
+    <select id="compareA" aria-label="First district"></select>
+    <span class="vs">vs</span>
+    <select id="compareB" aria-label="Second district"></select>
+  </div>
+  <div id="compareTableWrap"></div>
+</section>
+
+<section class="methodology-teaser">
+  <h2>How we did this</h2>
+  <p>All figures come from <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">311 Service Requests from 2010 to Present</a> (NYC Open Data), covering January 2021 through June 2026 and accessed July 2, 2026. Population adjustments use the 2020 decennial census, summed from census tracts to community districts. Trends compare full 12-month windows, which removes seasonality. We deliberately excluded several tempting sources — criminal summonses, subway fare evasion, storefront vacancies, the Mayor's Management Report — and the full <a href="methodology.html">methodology</a> explains why, along with every complaint-type grouping, every formula and every known limitation.</p>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="wordmark-footer">VITAL CITY</span>
+    <p>Source: <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">311 Service Requests from 2010 to Present</a> (NYC Open Data), accessed July 2, 2026 · <a href="https://www.census.gov/programs-surveys/decennial-census/about/rdo/summary-files.html">2020 decennial census</a> · <a href="methodology.html">Methodology</a></p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
