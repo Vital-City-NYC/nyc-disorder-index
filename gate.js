@@ -15,7 +15,6 @@
   overlay.className = 'gate-overlay';
   overlay.innerHTML = `
     <div class="gate-box">
-      <span class="gate-wordmark">VITAL CITY</span>
       <h1>The disorder index</h1>
       <p>This is an unpublished prototype. Enter the password to view it.</p>
       <form class="gate-form">

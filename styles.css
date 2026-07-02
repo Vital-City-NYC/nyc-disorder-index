@@ -45,7 +45,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
 
 /* Header */
 .site-header {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: flex-end;
   padding: 14px 20px; border-bottom: 3px solid var(--vc-black);
   position: relative;
 }
