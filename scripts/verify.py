@@ -101,6 +101,32 @@ noise = next(x for x in D["strands"] if x["id"]=="noise")["citywide"]["n12"]
 graf = next(x for x in D["strands"] if x["id"]=="graffiti")["citywide"]["n12"]
 print(f"       noise={noise:,}  graffiti={graf:,}  ratio={noise/graf:.1f}x")
 
+print("\n10. Conditions layer — rodent inspection citywide rate (independent)")
+try:
+    COND = json.load(open(os.path.join(DATA, "conditions_data.json")))
+    ROD = "https://data.cityofnewyork.us/resource/p937-wjvj.json"
+    def rq(params):
+        url = ROD + "?" + urllib.parse.urlencode(params)
+        with urllib.request.urlopen(url, timeout=180) as r:
+            return int(json.load(r)[0]["count"])
+    for label, start, end, key in [("last12", "2025-07-01", "2026-07-01", "value"),
+                                   ("prior12", "2024-07-01", "2025-07-01", "prior")]:
+        base = "inspection_type='Initial' and inspection_date >= '%s' and inspection_date < '%s'" % (start, end)
+        tot = rq({"$select": "count(*)", "$where": base})
+        hit = rq({"$select": "count(*)", "$where": base + " and starts_with(result,'Failed for Rat Activity')"})
+        src_rate = round(hit / tot * 100, 1)
+        pub = COND["strands"]["rodents"]["citywide"][key]
+        check(f"  rodent inspection {label} rate", pub, src_rate, tol=0.1)
+    print("       (note: source total includes null-coordinate rows; published citywide counts all geocoded rows)")
+
+    print("\n11. Conditions layer — pavement citywide poor share sanity bounds")
+    pv = COND["strands"]["decay"]["citywide"]
+    ok = 0 <= pv["value"] <= 100 and 1 <= pv["avg_rating"] <= 10
+    results.append(ok)
+    print(f"[{'PASS' if ok else '*** FAIL ***'}] pavement poor%={pv['value']} avg={pv['avg_rating']}/10 within valid ranges")
+except FileNotFoundError:
+    print("       conditions_data.json not present — skipping (run build_conditions.py)")
+
 print("\n" + "=" * 70)
 print(f"RESULT: {sum(results)}/{len(results)} checks passed")
 sys.exit(0 if all(results) else 1)

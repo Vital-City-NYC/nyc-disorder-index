@@ -40,6 +40,8 @@
 <tr><td>2020 decennial census, table P1 (total population) by census tract, via <a href="https://api.census.gov">api.census.gov</a></td><td>U.S. Census Bureau</td><td>April 1, 2020 counts</td><td>July 2, 2026</td></tr>
 <tr><td><a href="https://www.nyc.gov/assets/planning/download/office/planning-level/nyc-population/census2020/nyc2020census_tract_nta_cdta_relationships.xlsx?r=092221">2020 census tract to community district tabulation area relationship file</a></td><td>NYC Department of City Planning</td><td>2020 geographies</td><td>July 2, 2026</td></tr>
 <tr><td>Community district boundaries (water excluded)</td><td>NYC Department of City Planning, via its public ArcGIS service</td><td>Current boundaries</td><td>July 2, 2026</td></tr>
+<tr><td><a href="https://data.cityofnewyork.us/resource/p937-wjvj">Rodent Inspection</a> (p937-wjvj) — for the conditions layer</td><td>NYC Open Data (Department of Health)</td><td>Initial inspections, July 2024 – June 2026</td><td>July 2, 2026</td></tr>
+<tr><td><a href="https://data.cityofnewyork.us/resource/6yyb-pb25">Street Pavement Ratings</a> (6yyb-pb25) — for the conditions layer</td><td>NYC Open Data (Department of Transportation)</td><td>Segments inspected 2023 – 2026</td><td>July 2, 2026</td></tr>
 </table>
 <p>All 311 figures were retrieved as server-side aggregates (counts grouped by community board, complaint type and month) directly from the Open Data application programming interface. No raw records were re-keyed by hand at any point.</p>
 
@@ -59,6 +61,16 @@
 <tr><td>Streets in disrepair</td><td>Street Condition; Sidewalk Condition</td><td>Physical decay of the streetscape: potholes, cave-ins, broken pavement, damaged sidewalks.</td></tr>
 </table>
 <p>The strands are presented as equals even though their volumes differ enormously — over the past 12 months, noise generated about 46 times as many reports as graffiti (791,202 versus 17,212 citywide). That is deliberate: call volume reflects how reportable a problem is, not how much it matters.</p>
+
+<h2>The conditions layer: reports versus inspections</h2>
+<p>The single biggest limitation of a 311-based index is that it measures <em>reporting</em>, not <em>conditions</em> — a quiet neighborhood might have plenty of rats and few people who call. For two strands, the city runs an inspection program that lets us check the reports against what an inspector actually found. These appear on the relevant cards as a separate, blue-tinted panel, kept visually and methodologically apart from the 311 data.</p>
+<table>
+<tr><th>Strand</th><th>Inspection source</th><th>What we measure</th></tr>
+<tr><td>Rats and rodents</td><td>DOHMH Rodent Inspection (initial inspections only)</td><td>The share of initial inspections that found active rat signs (result "Failed for Rat Activity"). Because it is inspectors looking rather than residents calling, it is an independent read on where rats actually are. We report it per district with the same 12-months-vs-prior-12 trend and 1-of-59 ranking as the 311 strands. A district needs at least 30 inspections in each window to be given a trend.</td></tr>
+<tr><td>Streets in disrepair</td><td>DOT Street Pavement Ratings</td><td>The length-weighted share of a district's rated roadway in poor condition (a rating below 4 on DOT's 1–10 scale, where 10 is best), plus the average rating. Ratings are done on a rolling multi-year cycle, so this is a <strong>condition snapshot</strong> — we keep each segment's most recent rating from 2023 onward — not a 12-month trend. It is meant to be read against the report <em>levels</em>, not their direction.</td></tr>
+</table>
+<p>The point of the panel is the comparison, not agreement. Where reports and inspections diverge sharply — as in Elmhurst and South Corona, which sits near the bottom of the city in 311 rat complaints but near the top in inspector-found rat activity — the card says so plainly, because the gap between what a neighborhood reports and what is actually there is itself one of the most useful things this tool can show.</p>
+<p>Two honest caveats on this layer. Rodent inspections are geolocated by latitude and longitude and assigned to a community district by point-in-polygon; about 8 percent of inspections fall in parks, on the water's edge or at bad coordinates and are left out of district figures (the citywide rate includes every geocoded inspection and matches a direct query of the source exactly). And an "inspection" is not a neutral sample of the whole neighborhood — the Health Department inspects where it has reason to, often following complaints or known problem blocks — so the inspection rate reflects conditions among inspected properties, not a random audit of every building.</p>
 
 <h2>Geography</h2>
 <p>The unit is the community district, using the 311 record's <code>community_board</code> field, which the city assigns from the incident address. The 59 real community districts are included; records assigned to parks and other joint interest areas (such as Central Park) or marked "Unspecified" are excluded from district figures but included in citywide totals. In the analysis window, 2.6 percent of tracked reports could not be assigned to a district.</p>
@@ -81,6 +93,8 @@
 <tr><td>Subway fare evasion</td><td>Measured through enforcement and inspection, with the same deployment bias as summonses, and not published at neighborhood level.</td></tr>
 <tr><td>Storefront vacancies</td><td>The public registry data lags badly — the most recent reliable figures are years old — and this tool is built to be refreshed monthly.</td></tr>
 <tr><td>Mayor's Management Report cleanliness scorecards</td><td>Published on a long lag, with neighborhood-to-neighborhood variation too small to rank meaningfully (most districts score above 90 percent acceptably clean).</td></tr>
+<tr><td>Sanitation "Scorecard" street-cleanliness ratings</td><td>This would be the ideal inspection cross-check for the dirty-streets strand — inspectors rating whether streets are acceptably clean. But the Open Data feed (rqhp-hivt) has not been updated since October 2023 and appears discontinued, so there is no current observational measure of street cleanliness to add.</td></tr>
+<tr><td>Syringes collected in parks; restaurant rodent violations</td><td>Considered as further inspection cross-checks (for public drug use and for rats). Syringe collection is confined to parks and depends on where outreach programs operate, so it is not a fair district-to-district measure; restaurant rodent violations are indoor and commercial, and the direct rodent inspections already used are a cleaner signal. Both are held.</td></tr>
 </table>
 
 <h2>Limitations, plainly</h2>
@@ -91,7 +105,7 @@
 <p><strong>June 2026 is the freshest month shown</strong> and was pulled two days after it ended. 311 records are created at intake, so late-arriving records are rare but not impossible.</p>
 
 <h2>Reproducibility</h2>
-<p>The pipeline is two short Python scripts in the project repository: <code>scripts/build_populations.py</code> (census tract populations into district denominators) and <code>scripts/build_data.py</code> (311 aggregates into <code>data/disorder_data.json</code>, the single file the page reads). Both use only documented public endpoints, run in under two minutes and print citywide totals for cross-checking against the published page. Re-running them each month refreshes the entire product.</p>
+<p>The pipeline is a set of short Python scripts in the project repository: <code>scripts/build_populations.py</code> (census tract populations into district denominators), <code>scripts/build_data.py</code> (311 aggregates into <code>data/disorder_data.json</code>, the file the page reads), and <code>scripts/build_conditions.py</code> (rodent-inspection and pavement data into <code>data/conditions_data.json</code>, the conditions layer). A fourth script, <code>scripts/verify.py</code>, independently re-queries NYC Open Data with different query shapes and diffs every published number against the source. All use only documented public endpoints, run in a couple of minutes and print citywide totals for cross-checking against the published page. Re-running them each month refreshes the entire product.</p>
 
 <p style="margin-top:40px;color:var(--vc-charcoal);font-size:14px">Questions, corrections or a strand we should add? This is a first measure — the best available from administrative data, not the last word.</p>
 

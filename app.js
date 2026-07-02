@@ -12,7 +12,7 @@ const BORO_ORDER = ['Manhattan','Bronx','Brooklyn','Queens','Staten Island'];
 // rising/falling requires at least a 10% swing between 12-month windows.
 const TREND_UP = 10, TREND_DOWN = -10;
 
-let DATA = null, GEO = null;
+let DATA = null, GEO = null, COND = null;
 let selected = null;            // boro_cd string or null for citywide
 let yFromZero = true;
 let map, geoLayer, mapMode = 'rate', mapStrand = null;
@@ -45,8 +45,9 @@ function districtLabel(bcd) {
 Promise.all([
   fetch('data/disorder_data.json').then(r => r.json()),
   fetch('data/community_districts.geojson').then(r => r.json()),
-]).then(([data, geo]) => {
-  DATA = data; GEO = geo;
+  fetch('data/conditions_data.json').then(r => r.json()).catch(() => null),
+]).then(([data, geo, cond]) => {
+  DATA = data; GEO = geo; COND = cond;
   mapStrand = DATA.strands[0].id;
   $('heroMeta').textContent =
     `Covers ${fmtMonth(DATA.meta.months[0])} through ${fmtMonth(DATA.meta.months.at(-1))} · ` +
@@ -196,6 +197,58 @@ const STANDING_TEXT = {
   low: 'Fewer reports per resident than most of the city',
 };
 
+function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+/* ---------- conditions layer (inspections, not 311 reports) ----------
+   A handful of strands can be cross-checked against city inspection data —
+   people looking, not people calling. Returns the block HTML or '' . */
+function condStats(sid) {
+  if (!COND || !COND.strands[sid]) return null;
+  const c = COND.strands[sid];
+  const cur = selected ? c.districts[selected] : c.citywide;
+  return cur ? { ...cur, meta: c } : null;
+}
+
+function conditionsBlock(sid, st311) {
+  const cs = condStats(sid);
+  if (!cs) return '';
+  const m = cs.meta;
+  const pctNum = (v) => (v === null || v === undefined) ? '—' : v.toLocaleString('en-US', { maximumFractionDigits: 1 }) + '%';
+  let body, note = '';
+
+  if (sid === 'rodents') {
+    if (selected) {
+      const trend = cs.trend
+        ? ` — ${TREND_ARROW[cs.trend]} ${cs.trend} from ${pctNum(cs.prior)} the year before`
+        : '';
+      body = `Inspectors found active rat signs in <strong>${pctNum(cs.value)}</strong> of ${fmtNum(cs.base)} inspections here over the past 12 months, ${ordinal(cs.rank)}-highest of 59 districts${trend}.`;
+      // neutral, numeric divergence callout
+      if (st311 && st311.rank && cs.rank && Math.abs(st311.rank - cs.rank) >= 20) {
+        const repHigh = st311.rank < cs.rank; // lower rank number = more reports
+        note = `<div class="cond-note">Reports and inspections diverge here: 311 rat complaints rank this district ${ordinal(st311.rank)} of 59, while inspections rank its rat conditions ${ordinal(cs.rank)}. ${repHigh ? 'Residents report more than inspectors find.' : 'Inspectors find more than residents report.'}</div>`;
+      }
+    } else {
+      const trend = cs.trend ? `, ${cs.trend} from ${pctNum(cs.prior)} the year before` : '';
+      body = `<strong>${pctNum(cs.value)}</strong> of the city's ${fmtNum(cs.base)} rat inspections found active rat signs over the past 12 months${trend}.`;
+    }
+  } else if (sid === 'decay') {
+    if (selected) {
+      body = `<strong>${pctNum(cs.value)}</strong> of this district's rated roadway is in poor condition (average rating ${cs.avg_rating} of 10), ${ordinal(cs.rank)}-worst of 59.`;
+    } else {
+      body = `<strong>${pctNum(cs.value)}</strong> of the city's rated roadway is in poor condition; average rating ${cs.avg_rating} of 10.`;
+    }
+    note = `<div class="cond-note">A condition snapshot — ${m.window.split(';')[0].replace('roads last inspected ', 'roads last inspected ')} — not a 12-month trend, so it is read against the report <em>levels</em> above, not their direction.</div>`;
+  }
+
+  return `<div class="cond-block">
+    <div class="cond-label">Inspection cross-check · <a href="${m.source_url}" target="_blank" rel="noopener">${m.source}</a></div>
+    <p class="cond-body">${body}</p>${note}
+  </div>`;
+}
+
 function renderCards() {
   const grid = $('cardsGrid');
   grid.innerHTML = '';
@@ -225,6 +278,7 @@ function renderCards() {
       ${sparklineSVG(s.id)}
       <div class="spark-caption"><span>${fmtMonth(DATA.meta.months[0])}</span><span>${selected ? 'orange: district · dashed: citywide' : 'citywide per 1,000 residents'}</span><span>${fmtMonth(DATA.meta.months.at(-1))}</span></div>
       ${conc}
+      ${conditionsBlock(s.id, st)}
       <p class="fine-print"><strong>What feeds this:</strong> 311 complaint types ${s.types.map(t => `“${t}”`).join(', ')}. ${s.desc}</p>`;
     grid.appendChild(card);
   });
